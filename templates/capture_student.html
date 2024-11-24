@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm Học Sinh Mới</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            min-height: 100vh;
+            padding: 2rem 0;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .registration-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .registration-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-section {
+            padding: 1rem;
+        }
+
+        .image-section {
+            padding: 1rem;
+            border-left: 1px solid #eee;
+        }
+
+        .form-title {
+            color: #1565c0;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .form-floating {
+            margin-bottom: 1rem;
+        }
+
+        .image-capture-section {
+            margin-top: 2rem;
+        }
+
+        .capture-options {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .option-btn {
+            flex: 1;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            background: #f0f0f0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .option-btn.active {
+            background: #1565c0;
+            color: white;
+        }
+
+        .preview-container {
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .preview-container img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #video {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #1565c0;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            margin-top: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: #0d47a1;
+        }
+
+        .file-upload {
+            border: 2px dashed #ccc;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+
+        .file-upload:hover {
+            border-color: #1565c0;
+        }
+
+        .file-input {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="registration-container">
+            <!-- Form Section -->
+            <div class="form-section">
+                <h3 class="form-title">
+                    <i class="fas fa-user-plus me-2"></i>Thông tin học sinh
+                </h3>
+                
+                <form id="studentForm" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Họ và tên" required>
+                        <label for="name">Họ và tên</label>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+                        <label for="email">Email</label>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input type="tel" class="form-control" id="phone" name="phone" placeholder="Số điện thoại" required>
+                        <label for="phone">Số điện thoại</label>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="student_class" name="student_class" placeholder="Lớp" required>
+                        <label for="student_class">Lớp</label>
+                    </div>
+
+                    <!-- <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="authorized" name="authorized">
+                        <label class="form-check-label" for="authorized">
+                            Xác thực ngay
+                        </label>
+                    </div> -->
+                </form>
+            </div>
+
+            <!-- Image Section -->
+            <div class="image-section">
+                <h3 class="form-title">
+                    <i class="fas fa-camera me-2"></i>Ảnh học sinh
+                </h3>
+
+                <div class="capture-options">
+                    <button type="button" class="option-btn active" id="uploadBtn">
+                        <i class="fas fa-upload me-2"></i>Tải ảnh lên
+                    </button>
+                    <button type="button" class="option-btn" id="cameraBtn">
+                        <i class="fas fa-camera me-2"></i>Chụp ảnh
+                    </button>
+                </div>
+
+                <!-- Upload Section -->
+                <div id="uploadSection">
+                    <div class="file-upload">
+                        <input type="file" id="imageInput" name="student_image" accept="image/*" class="file-input">
+                        <label for="imageInput">
+                            <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                            <p>Nhấp để chọn ảnh hoặc kéo thả vào đây</p>
+                        </label>
+                    </div>
+                    <div id="imagePreview" class="preview-container"></div>
+                </div>
+
+                <!-- Camera Section -->
+                <div id="cameraSection" style="display: none;">
+                    <video id="video" autoplay playsinline></video>
+                    <button type="button" id="captureBtn" class="submit-btn">
+                        <i class="fas fa-camera me-2"></i>Chụp ảnh
+                    </button>
+                    <canvas id="canvas" style="display: none;"></canvas>
+                    <div id="cameraPreview" class="preview-container"></div>
+                </div>
+
+                <input type="hidden" name="captured_image" id="capturedImageData">
+
+                <!-- Submit Button -->
+                <button type="button" class="submit-btn" onclick="submitForm()">
+                    <i class="fas fa-save me-2"></i>Lưu thông tin
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadBtn = document.getElementById('uploadBtn');
+            const cameraBtn = document.getElementById('cameraBtn');
+            const uploadSection = document.getElementById('uploadSection');
+            const cameraSection = document.getElementById('cameraSection');
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const captureBtn = document.getElementById('captureBtn');
+            const imageInput = document.getElementById('imageInput');
+            const imagePreview = document.getElementById('imagePreview');
+            const cameraPreview = document.getElementById('cameraPreview');
+            const capturedImageData = document.getElementById('capturedImageData');
+            let stream = null;
+
+            // Toggle between upload and camera
+            uploadBtn.addEventListener('click', function() {
+                uploadBtn.classList.add('active');
+                cameraBtn.classList.remove('active');
+                uploadSection.style.display = 'block';
+                cameraSection.style.display = 'none';
+                stopCamera();
+            });
+
+            cameraBtn.addEventListener('click', async function() {
+                cameraBtn.classList.add('active');
+                uploadBtn.classList.remove('active');
+                uploadSection.style.display = 'none';
+                cameraSection.style.display = 'block';
+                startCamera();
+            });
+
+            // File upload preview
+            imageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                        capturedImageData.value = '';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Camera functions
+            async function startCamera() {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    video.srcObject = stream;
+                } catch (err) {
+                    alert('Không thể truy cập camera. Vui lòng kiểm tra lại quyền truy cập.');
+                }
+            }
+
+            function stopCamera() {
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    stream = null;
+                }
+            }
+
+            // Capture photo
+            captureBtn.addEventListener('click', function() {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0);
+                
+                const imageData = canvas.toDataURL('image/jpeg');
+                cameraPreview.innerHTML = `<img src="${imageData}" alt="Captured">`;
+                capturedImageData.value = imageData;
+            });
+
+            // Form submission
+            window.submitForm = function() {
+                const form = document.getElementById('studentForm');
+                const formData = new FormData(form);
+                const capturedImageData = document.getElementById('capturedImageData');
+                const imageInput = document.getElementById('imageInput');
+                const uploadBtn = document.getElementById('uploadBtn');
+                
+                // Check if we're in upload mode and no image is selected
+                if (uploadBtn.classList.contains('active') && !imageInput.files[0]) {
+                    alert('Vui lòng chọn ảnh trước khi lưu thông tin!');
+                    return;
+                }
+                
+                // Check if we're in camera mode and no image is captured
+                if (!uploadBtn.classList.contains('active') && !capturedImageData.value) {
+                    alert('Vui lòng chụp ảnh trước khi lưu thông tin!');
+                    return;
+                }
+
+                // Add image data
+                if (capturedImageData.value) {
+                    formData.append('captured_image', capturedImageData.value);
+                } else if (imageInput.files[0]) {
+                    formData.append('student_image', imageInput.files[0]);
+                }
+
+                // Submit the form
+                fetch('{% url "capture_student" %}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Thêm học sinh thành công!');
+                        window.location.href = '{% url "student-list" %}';
+                    } else {
+                        alert(data.error || 'Có lỗi xảy ra. Vui lòng thử lại.');
+                    }
+                })
+                .catch(error => {
+                    alert('Có lỗi xảy ra. Vui lòng thử lại.');
+                });
+            };
+        });
+    </script>
+</body>
+
+</html>

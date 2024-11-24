@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách xe bus</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .bus-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .bus-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .bus-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bus-details {
+            flex: 1;
+        }
+
+        .bus-name {
+            color: #1565c0;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .bus-route {
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .driver-info {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-online {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-offline {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .track-button {
+            background: #1565c0;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .track-button:hover {
+            background: #0d47a1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        .back-button {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            background: white;
+            color: #1565c0;
+            padding: 1rem;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            color: #0d47a1;
+        }
+
+        @media (max-width: 768px) {
+            .bus-info {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .track-button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">
+            <i class="fas fa-map-marked-alt me-2"></i>
+            Theo dõi xe bus
+        </h1>
+
+        <div id="map" style="height: 500px; margin-bottom: 2rem; border-radius: 15px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);"></div>
+        
+
+        <div id="bus-list">
+            {% for bus in buses %}
+            <div class="bus-card" id="bus-card-{{ bus.id }}">
+                <div class="bus-info">
+                    <div class="bus-details">
+                        <h2 class="bus-name">
+                            <i class="fas fa-bus me-2"></i>{{ bus.name }}
+                        </h2>
+                        <div class="bus-route">
+                            <i class="fas fa-route me-2"></i>{{ bus.route }}
+                        </div>
+                        <div class="driver-info">
+                            <i class="fas fa-user me-2"></i>{{ bus.driver_name }} | 
+                            <i class="fas fa-phone me-2"></i>{{ bus.driver_phone }}
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="mb-3">
+                            {% if bus.has_location %}
+                                <span class="status-badge status-online">
+                                    <i class="fas fa-signal"></i>
+                                    Đang hoạt động
+                                </span>
+                            {% else %}
+                                <span class="status-badge status-offline">
+                                    <i class="fas fa-power-off"></i>
+                                    Không hoạt động
+                                </span>
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'driver-tracking' bus.id %}" class="track-button">
+                            <i class="fas fa-location-arrow"></i>
+                            Theo dõi xe
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <a href="{% url 'home' %}" class="back-button" title="Trở về trang chủ">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <script>
+        const map = L.map('map').setView([10.8231, 106.6297], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        const busIcon = L.divIcon({
+            html: '<i class="fas fa-bus fa-2x" style="color: #1565c0;"></i>',
+            className: 'bus-marker',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+
+        const busMarkers = {};
+        let isTracking = true;
+
+        function fitMapToBuses(locations) {
+            if (locations.length > 0) {
+                const bounds = L.latLngBounds(locations.map(loc => [loc.latitude, loc.longitude]));
+                map.fitBounds(bounds, {
+                    padding: [50, 50],
+                    maxZoom: 15
+                });
+            }
+        }
+
+        function updateBusLocations() {
+            if (!isTracking) return;
+
+            fetch('/get-bus-locations/')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Check if no buses are active
+                    if (!data.locations || data.locations.length === 0) {
+                        loadingIndicator.style.backgroundColor = '#f44336';
+                        loadingIndicator.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Không có xe hoạt động';
+                        
+                        // Update all bus cards to show inactive status
+                        const allBusCards = document.querySelectorAll('[id^="bus-card-"]');
+                        allBusCards.forEach(card => {
+                            const busId = card.id.replace('bus-card-', '');
+                            const statusBadge = card.querySelector('.status-badge');
+                            if (statusBadge) {
+                                statusBadge.className = 'status-badge status-offline';
+                                statusBadge.innerHTML = `
+                                    <i class="fas fa-power-off"></i>
+                                    Không hoạt động
+                                `;
+                            }
+                            // Remove markers if they exist
+                            if (busMarkers[busId]) {
+                                map.removeLayer(busMarkers[busId]);
+                                delete busMarkers[busId];
+                            }
+                        });
+                        return;
+                    }
+
+                    // Reset loading indicator if buses are active
+                    loadingIndicator.style.backgroundColor = '#1565c0';
+                    loadingIndicator.innerHTML = '<i class="fas fa-sync-alt fa-spin me-2"></i> Đang cập nhật vị trí';
+
+                    // Update active buses
+                    data.locations.forEach(location => {
+                        if (busMarkers[location.bus_id]) {
+                            busMarkers[location.bus_id].setLatLng([location.latitude, location.longitude]);
+                        } else {
+                            const marker = L.marker([location.latitude, location.longitude], {
+                                icon: busIcon
+                            }).addTo(map);
+                            busMarkers[location.bus_id] = marker;
+                        }
+
+                        const popupContent = `
+                            <strong>${location.name}</strong><br>
+                            Tài xế: ${location.driver_name}<br>
+                            Tuyến: ${location.route}<br>
+                            Cập nhật: ${location.last_updated}
+                        `;
+                        busMarkers[location.bus_id].bindPopup(popupContent);
+
+                        // Update status badge
+                        const statusBadge = document.querySelector(`#bus-card-${location.bus_id} .status-badge`);
+                        if (statusBadge) {
+                            statusBadge.className = 'status-badge status-online';
+                            statusBadge.innerHTML = `
+                                <i class="fas fa-signal"></i>
+                                Đang hoạt động (${location.last_updated})
+                            `;
+                        }
+                    });
+
+                    // Update inactive buses
+                    const allBusIds = Array.from(document.querySelectorAll('[id^="bus-card-"]'))
+                        .map(el => parseInt(el.id.replace('bus-card-', '')));
+                    
+                    const activeBusIds = data.locations.map(loc => loc.bus_id);
+                    
+                    allBusIds.forEach(busId => {
+                        if (!activeBusIds.includes(busId)) {
+                            const statusBadge = document.querySelector(`#bus-card-${busId} .status-badge`);
+                            if (statusBadge) {
+                                statusBadge.className = 'status-badge status-offline';
+                                statusBadge.innerHTML = `
+                                    <i class="fas fa-power-off"></i>
+                                    Không hoạt động
+                                `;
+                            }
+                            if (busMarkers[busId]) {
+                                map.removeLayer(busMarkers[busId]);
+                                delete busMarkers[busId];
+                            }
+                        }
+                    });
+
+                    // Fit map to show all active buses
+                    if (data.locations.length > 0) {
+                        fitMapToBuses(data.locations);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching bus locations:', error);
+                    loadingIndicator.style.backgroundColor = '#f44336';
+                    loadingIndicator.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Lỗi kết nối';
+                });
+        }
+
+        const loadingIndicator = document.createElement('div');
+        loadingIndicator.style.position = 'fixed';
+        loadingIndicator.style.bottom = '20px';
+        loadingIndicator.style.right = '20px';
+        loadingIndicator.style.padding = '10px 20px';
+        loadingIndicator.style.borderRadius = '20px';
+        loadingIndicator.style.backgroundColor = '#1565c0';
+        loadingIndicator.style.color = 'white';
+        loadingIndicator.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+        loadingIndicator.style.cursor = 'pointer';
+        loadingIndicator.innerHTML = '<i class="fas fa-sync-alt fa-spin me-2"></i> Đang cập nhật vị trí';
+        document.body.appendChild(loadingIndicator);
+
+        // Add click handler for loading indicator
+        loadingIndicator.addEventListener('click', () => {
+            isTracking = !isTracking;
+            if (isTracking) {
+                loadingIndicator.style.backgroundColor = '#1565c0';
+                loadingIndicator.innerHTML = '<i class="fas fa-sync-alt fa-spin me-2"></i> Đang cập nhật vị trí';
+                updateBusLocations();
+            } else {
+                loadingIndicator.style.backgroundColor = '#f44336';
+                loadingIndicator.innerHTML = '<i class="fas fa-pause me-2"></i> Đã tạm dừng cập nhật';
+            }
+        });
+
+        updateBusLocations();
+        const updateInterval = setInterval(updateBusLocations, 2000); // Update every 2 seconds
+
+        // Handle page visibility
+        document.addEventListener('visibilitychange', () => {
+            isTracking = !document.hidden;
+            if (isTracking) {
+                updateBusLocations();
+            }
+        });
+
+        window.addEventListener('beforeunload', () => {
+            clearInterval(updateInterval);
+            isTracking = false;
+        });
+    </script>
+</body>
+</html> 

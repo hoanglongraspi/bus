@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác thực học sinh</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .page-title {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .student-details {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .detail {
+            padding: 0.8rem;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+        }
+
+        .detail:last-child {
+            border-bottom: none;
+        }
+
+        .detail strong {
+            min-width: 150px;
+            color: #1e3c72;
+        }
+
+        .auth-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .auth-status.authorized {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .auth-status.unauthorized {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .form-group {
+            margin: 2rem 0;
+        }
+
+        .form-check {
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .form-check:hover {
+            background-color: #e9ecef;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border: none;
+            padding: 0.8rem 2rem;
+            font-weight: bold;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .action-buttons a {
+            flex: 1;
+            text-align: center;
+            padding: 0.8rem;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .btn-back {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-view {
+            background-color: #1e3c72;
+            color: white;
+        }
+
+        .btn-back:hover, .btn-view:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        .back-button {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            background: #1565c0;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            transform: scale(1.1);
+            color: white;
+            text-decoration: none;
+        }
+
+        .student-image {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .profile-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #1565c0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .no-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            border: 4px solid #1565c0;
+        }
+
+        .no-image i {
+            font-size: 4rem;
+            color: #757575;
+            margin-bottom: 0.5rem;
+        }
+
+        .no-image p {
+            color: #757575;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .student-details {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .detail {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1 class="page-title" style="color: #1e3c72;">Xác thực học sinh</h1>
+    <div class="container">
+        <div class="student-details">
+            <div class="student-image">
+                {% if student.image %}
+                    <img src="{{ student.image.url }}" alt="{{ student.name }}'s photo" class="profile-image">
+                {% else %}
+                    <div class="no-image">
+                        <i class="fas fa-user"></i>
+                        <p>No image available</p>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="detail">
+                <strong><i class="fas fa-user me-2"></i>Họ và tên:</strong>
+                <span>{{ student.name }}</span>
+            </div>
+            <div class="detail">
+                <strong><i class="fas fa-envelope me-2"></i>Email:</strong>
+                <span>{{ student.email }}</span>
+            </div>
+            <div class="detail">
+                <strong><i class="fas fa-phone me-2"></i>Số điện thoại:</strong>
+                <span>{{ student.phone_number }}</span>
+            </div>
+            <div class="detail">
+                <strong><i class="fas fa-graduation-cap me-2"></i>Lớp:</strong>
+                <span>{{ student.student_class }}</span>
+            </div>
+            <div class="detail">
+                <strong><i class="fas fa-check-circle me-2"></i>Trạng thái:</strong>
+                <span class="auth-status {% if student.authorized %}authorized{% else %}unauthorized{% endif %}">
+                    {% if student.authorized %}Đã xác thực{% else %}Chưa xác thực{% endif %}
+                </span>
+            </div>
+        </div>
+
+        <form method="post" class="mt-4">
+            {% csrf_token %}
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="authorized" name="authorized" 
+                       {% if student.authorized %}checked{% endif %}>
+                <label class="form-check-label" for="authorized">
+                    <i class="fas fa-user-shield me-2"></i>Xác thực học sinh này
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary mt-4">
+                <i class="fas fa-save me-2"></i>Cập nhật trạng thái
+            </button>
+        </form>
+
+        <div class="action-buttons">
+            <a href="{% url 'student-list' %}" class="btn-back">
+                <i class="fas fa-list me-2"></i>Danh sách học sinh
+            </a>
+            <a href="{% url 'student-detail' pk=student.pk %}" class="btn-view">
+                <i class="fas fa-eye me-2"></i>Xem chi tiết
+            </a>
+        </div>
+    </div>
+
+    <a href="{% url 'home' %}" class="back-button" title="Trở về trang chủ">
+        <i class="fas fa-arrow-left"></i>
+        <span class="ms-2">Trở về</span>
+    </a>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

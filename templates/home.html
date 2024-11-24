@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Điểm Danh Bằng AI</title>
+    <!-- Include Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        /* Global Styles */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #e3f2fd;
+            color: #2c3e50;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background-color: #90caf9;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar h1 {
+            margin: 0;
+            color: #1565c0;
+            font-size: 1.8em;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #bbdefb, #e3f2fd);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero-section h1 {
+            color: #1565c0;
+            font-size: 2.5em;
+            margin-bottom: 1rem;
+        }
+
+        .hero-section p {
+            color: #37474f;
+            font-size: 1.2em;
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+
+        /* Grid Layout for Cards */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e3f2fd;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            border-color: #90caf9;
+        }
+
+        .card i {
+            font-size: 2.5em;
+            color: #1565c0;
+            margin-bottom: 1rem;
+        }
+
+        .card p {
+            color: #37474f;
+            font-size: 1.1em;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 3rem 0;
+            padding: 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .stat-card h3 {
+            color: #1565c0;
+            font-size: 2em;
+            margin: 0;
+        }
+
+        .stat-card p {
+            color: #37474f;
+            margin: 0.5rem 0 0;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #90caf9;
+            color: #1565c0;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        footer a {
+            color: #1565c0;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-section h1 {
+                font-size: 2em;
+            }
+            
+            .feature-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>Hệ Thống Điểm Danh AI</h1>
+    </nav>
+
+    <div class="main-content">
+        <div class="hero-section">
+            <h1>Hệ Thống Điểm Danh Bằng Nhận Diện Khuôn Mặt AI</h1>
+            <p>Giải pháp điểm danh thông minh sử dụng công nghệ nhận diện khuôn mặt AI</p>
+
+            <div class="feature-grid">
+                <div class="card">
+                    <a href="{% url 'capture_student' %}">
+                        <i class="fas fa-user-plus"></i>
+                        <p>Đăng Ký Học Sinh</p>
+                    </a>
+                </div>
+                <div class="card">
+                    <a href="{% url 'capture_and_recognize' %}">
+                        <i class="fas fa-bus-alt"></i>
+                        <p>Điểm Danh Lên/Xuống Xe</p>
+                    </a>
+                </div>
+                <div class="card">
+                    <a href="{% url 'student_attendance_list' %}">
+                        <i class="fas fa-list"></i>
+                        <p>Xem Điểm Danh</p>
+                    </a>
+                </div>
+                <div class="card">
+                    <a href="{% url 'student-list' %}">
+                        <i class="fas fa-user-friends"></i>
+                        <p>Quản Lý Học sinh</p>
+                    </a>
+                </div>
+                <div class="card">
+                    <a href="{% url 'camera_config_create' %}">
+                        <i class="fas fa-cog"></i>
+                        <p>Cài Đặt Camera</p>
+                    </a>
+                </div>
+                <!-- <div class="card">
+                    <a href="{% url 'bus-attendance' %}">
+                        <i class="fas fa-clipboard-check"></i>
+                        <p>Điểm Danh Theo Bus</p>
+                    </a>
+                </div> -->
+                <div class="card">
+                    <a href="{% url 'bus-list' %}">
+                        <i class="fas fa-bus"></i>
+                        <p>Quản Lý Xe Bus</p>
+                    </a>
+                </div>
+                <div class="card">
+                    <a href="{% url 'bus-tracking' %}">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <p>Theo Dõi Xe Bus</p>
+                    </a>
+                </div>
+                <div class="card">
+                    <a href="{% url 'driver-dashboard' %}">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <p>Driver Dashboard</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <div class="stat-card">
+                <h3><i class="fas fa-child"></i></h3>
+                <p>An Toàn Học Sinh</p>
+                <span>Theo dõi lên xuống xe</span>
+            </div>
+            <div class="stat-card">
+                <h3><i class="fas fa-mobile-alt"></i></h3>
+                <p>Thông Báo Phụ Huynh</p>
+                <span>Cập nhật thời gian thực</span>
+            </div>
+            <div class="stat-card">
+                <h3><i class="fas fa-map-marked-alt"></i></h3>
+                <p>Định Vị GPS</p>
+                <span>Theo dõi vị trí xe</span>
+            </div>
+            <div class="stat-card">
+                <h3><i class="fas fa-history"></i></h3>
+                <p>Lịch Sử Di Chuyển</p>
+                <span>Báo cáo chi tiết hàng ngày</span>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Phát triển bởi Cao Phi</p>
+    </footer>
+</body>
+</html>
