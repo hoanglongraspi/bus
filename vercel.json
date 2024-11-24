@@ -3,7 +3,10 @@
     "builds": [
       {
         "src": "Project101/wsgi.py",
-        "use": "@vercel/python@3.1.0"
+        "use": "@vercel/python",
+        "config": {
+          "runtime": "python3.9"
+        }
       },
       {
         "src": "build_files.sh",
